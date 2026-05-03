@@ -18,6 +18,7 @@ documents.db
 graphify-out/
 
 # PKI and Temporary Files (CRITICAL)
+cert.p12
 certs/
 tmp/
 scratch/

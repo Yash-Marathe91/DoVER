@@ -46,12 +46,12 @@ const createLimiter = (windowMs, limit, actionName) => rateLimit({
     handler: makeHandler(actionName),
     store: new RedisStore({
         sendCommand: (...args) => {
-            if (!redisReady) throw new Error('Redis not ready');
+            if (!redisReady) return Promise.resolve(0); // Graceful fallback during connection phase
             return redisClient.sendCommand(args);
         },
         prefix: `rl:${actionName}:`
     }),
-    skip: () => !redisReady  // Skip Redis-backed limiting entirely when Redis is down (falls back to memory)
+    skip: () => !redisReady
 });
 
 // 10 uploads per hour

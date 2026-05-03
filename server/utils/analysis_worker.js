@@ -1,5 +1,5 @@
 const { parentPort, workerData } = require('worker_threads');
-const { Jimp } = require('jimp');
+const Jimp = require('jimp').Jimp || require('jimp');
 const tf = require('@tensorflow/tfjs');
 const fs = require('fs');
 

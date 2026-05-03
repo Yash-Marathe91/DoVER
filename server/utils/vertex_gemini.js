@@ -12,7 +12,7 @@ async function generateDocumentSummary(ocrText, forensicReport) {
     if (!ocrText || ocrText.trim().length === 0) return { status: "skipped", reason: "No OCR text" };
 
     try {
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' });
 
         const prompt = `
             You are a forensic document analyst. Analyze this document.

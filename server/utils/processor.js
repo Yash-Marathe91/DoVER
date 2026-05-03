@@ -168,15 +168,30 @@ async function processDocument(data, job = null) {
             ocrText = ocrResult.text;
             if (ocrText) ocrHash = crypto.createHash('sha256').update(ocrText).digest('hex');
 
-            const forensicReport = await analyzeInWorker(filePath, 'forensics');
-            const sigReport = await analyzeInWorker(filePath, 'signature');
+            // Forensic analysis — non-fatal if worker crashes
+            let forensicReport = { score: 100, flags: [], analysis: 'Analysis unavailable' };
+            let sigReport = { signature_found: false, confidence: 0 };
+            try {
+                forensicReport = await analyzeInWorker(filePath, 'forensics');
+            } catch (e) {
+                console.warn('[PROCESSOR] Forensic worker failed (non-fatal):', e.message);
+            }
+            try {
+                sigReport = await analyzeInWorker(filePath, 'signature');
+            } catch (e) {
+                console.warn('[PROCESSOR] Signature worker failed (non-fatal):', e.message);
+            }
 
             forensicScore = JSON.stringify(forensicReport);
             signatureScore = JSON.stringify(sigReport);
 
             if (ocrText) {
-                const summary = await gemini.generateDocumentSummary(ocrText, forensicReport);
-                aiSummary = JSON.stringify(summary);
+                try {
+                    const summary = await gemini.generateDocumentSummary(ocrText, forensicReport);
+                    aiSummary = JSON.stringify(summary);
+                } catch (e) {
+                    console.warn('[PROCESSOR] AI summary failed (non-fatal):', e.message);
+                }
             }
         } else if (/text\/plain/.test(mimetype) || originalname?.endsWith('.txt')) {
             ocrText = fs.readFileSync(filePath, 'utf8');

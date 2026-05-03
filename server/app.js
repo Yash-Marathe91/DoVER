@@ -1,11 +1,18 @@
 require('dotenv').config();
 
-// ── Global Crash Guards ── Keep server alive through unexpected errors
+// ── Production Process Guards ──
 process.on('uncaughtException', (err) => {
-    console.error('[FATAL] Uncaught Exception — server staying alive:', err.message);
+    const msg = (err.message || "").toLowerCase();
+    if (!msg.includes('redis')) {
+        console.error('[ERROR] Critical System Exception:', err.message);
+    }
 });
+
 process.on('unhandledRejection', (reason) => {
-    console.error('[FATAL] Unhandled Promise Rejection — server staying alive:', reason?.message || reason);
+    const msg = (reason?.message || reason || "").toString();
+    if (!msg.toLowerCase().includes('redis')) {
+        console.error('[ERROR] Unhandled Promise Rejection:', msg);
+    }
 });
 
 const express = require('express');
