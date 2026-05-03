@@ -3,11 +3,15 @@ const db = require('../db/db');
 
 // Use the same Redis URL as the queue
 const redisUrl = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
+const isTLS = redisUrl.startsWith('rediss://');
 let redisClient;
 
 async function getRedisClient() {
     if (!redisClient) {
-        redisClient = createClient({ url: redisUrl });
+        redisClient = createClient({
+            url: redisUrl,
+            ...(isTLS ? { socket: { tls: true, rejectUnauthorized: false } } : {})
+        });
         redisClient.on('error', (err) => console.error('Redis Client Error', err));
         await redisClient.connect();
     }

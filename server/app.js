@@ -39,9 +39,14 @@ const app = express();
 app.set('trust proxy', 1);
 
 // Redis Client for Rate Limiting
+const REDIS_URL_MAIN = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
+const isMainTLS = REDIS_URL_MAIN.startsWith('rediss://');
 const redisClient = createClient({
-    url: process.env.REDIS_URL || 'redis://127.0.0.1:6379',
-    socket: { connectTimeout: 5000 } // 5 second timeout to prevent hangs
+    url: REDIS_URL_MAIN,
+    socket: {
+        connectTimeout: 5000,
+        ...(isMainTLS ? { tls: true, rejectUnauthorized: false } : {})
+    }
 });
 
 redisClient.on('error', (err) => console.warn('[REDIS_ERROR] Offline — falling back to memory:', err.message));

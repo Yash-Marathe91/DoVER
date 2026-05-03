@@ -118,24 +118,15 @@ router.get('/batch/:batch_id/status', async (req, res) => {
         // but since we don't store batch->job mapping in DB yet, we'll keep the logic but 
         // optimize it to not pull every job's full data if possible.
         
-        // BETTER: Use Bull's built-in filtering if possible, or just pull the IDs first.
-        const [waitingIds, activeIds, completedIds, failedIds] = await Promise.all([
-            documentQueue.getWaitingIds(),
-            documentQueue.getActiveIds(),
-            documentQueue.getCompletedIds(),
-            documentQueue.getFailedIds()
+        const [waiting, active, completed, failed] = await Promise.all([
+            documentQueue.getWaiting(),
+            documentQueue.getActive(),
+            documentQueue.getCompleted(),
+            documentQueue.getFailed()
         ]);
 
-        const allJobIds = [...waitingIds, ...activeIds, ...completedIds, ...failedIds];
-        const batchJobs = [];
-
-        // Only fetch job data for jobs that actually exist to save memory
-        for (const jobId of allJobIds) {
-            const job = await documentQueue.getJob(jobId);
-            if (job && job.data && job.data.batch_id === batchId) {
-                batchJobs.push(job);
-            }
-        }
+        const allJobs = [...waiting, ...active, ...completed, ...failed];
+        const batchJobs = allJobs.filter(job => job && job.data && job.data.batch_id === batchId);
 
         if (batchJobs.length === 0) {
             return res.status(404).json({ success: false, error: 'No jobs found for this batch_id' });
@@ -148,6 +139,11 @@ router.get('/batch/:batch_id/status', async (req, res) => {
         if (!isAuthority && !ownsBatch) {
             return res.status(403).json({ success: false, error: 'Permission denied' });
         }
+
+        const waitingIds = waiting.map(j => j.id);
+        const activeIds = active.map(j => j.id);
+        const failedIds = failed.map(j => j.id);
+        const completedIds = completed.map(j => j.id);
 
         // Map each job to a clean status object
         const jobs = batchJobs.map(j => {
