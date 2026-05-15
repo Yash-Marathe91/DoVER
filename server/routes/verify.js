@@ -532,22 +532,36 @@ router.post('/', verifyLimiter, apiKey, upload.single('file'), async (req, res) 
 
         // 5. Final Result
         let tamper_reasons = [];
-        if (!verificationResult.valid) tamper_reasons.push("File hash mismatch");
-        if (ocr_tampered) tamper_reasons.push("OCR text similarity below threshold");
-        if (forensic_comparison && forensic_comparison.suspicious_change) tamper_reasons.push("Forensic analysis detected modifications");
-        if (signature_comparison && signature_comparison.status_change) tamper_reasons.push("Signature/Seal presence changed");
-        if (signature_mismatch) tamper_reasons.push("Signature mismatch");
+        const fileHashValid = !!verificationResult.valid;
+        
+        if (!fileHashValid) {
+            tamper_reasons.push("File hash mismatch");
+            
+            // If the hash doesn't match, these content-based checks become the primary evidence for tampering
+            if (ocr_tampered) tamper_reasons.push("OCR text similarity below threshold");
+            if (forensic_comparison && forensic_comparison.suspicious_change) tamper_reasons.push("Forensic analysis detected modifications");
+            if (signature_comparison && signature_comparison.status_change) tamper_reasons.push("Signature/Seal presence changed");
+        }
+        
+        // Digital Signature is a cryptographic requirement independent of heuristics
+        if (signature_mismatch) {
+            tamper_reasons.push("Signature mismatch");
+        }
         
         const isTampered = tamper_reasons.length > 0;
         
         console.log(`\n┌── Verification Results for Block #${doc.block_index}`);
-        console.log(`│ - File Hash Match: ${verificationResult.valid ? 'YES' : 'NO'}`);
+        console.log(`│ - File Hash Match: ${fileHashValid ? 'YES' : 'NO'}`);
         console.log(`│ - OCR Similarity: ${ocr_similarity !== null ? ocr_similarity.toFixed(2) + '%' : 'SKIPPED (Low Confidence)'}`);
-        console.log(`│ - Forensic Suspicious: ${forensic_comparison ? forensic_comparison.suspicious_change : 'NO CHANGE'}`);
+        console.log(`│ - Forensic Suspicious: ${forensic_comparison ? (forensic_comparison.suspicious_change ? 'YES (CHANGE)' : 'NO CHANGE') : 'N/A'}`);
         console.log(`│ - Signature Valid: ${!signature_mismatch}`);
         console.log(`│ - Chain Status: ${historical_tamper_detected ? '⚠️ WARNING (Historical Tamper at #' + tampered_block_id + ')' : '✅ SECURE'}`);
         console.log(`│ - Final Verdict: ${isTampered ? '🔴 TAMPERED' : '✅ ORIGINAL'}`);
-        if (tamper_reasons.length > 0) console.log(`│ - Reasons: ${tamper_reasons.join(', ')}`);
+        if (tamper_reasons.length > 0) {
+            console.log(`│ - Reasons: ${tamper_reasons.join(', ')}`);
+        } else if (fileHashValid && (ocr_tampered || (forensic_comparison && forensic_comparison.suspicious_change))) {
+            console.log(`│ - Note: Minor content analysis variance detected but ignored due to valid file hash.`);
+        }
         console.log(`└── Verification Cycle Complete\n`);
 
         if (isTampered) {
