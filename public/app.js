@@ -1475,7 +1475,7 @@ function renderSettings(app) {
 function renderHelp(app) {
     document.getElementById('page-title').textContent = 'System Protocol Guide';
     const wrap = document.createElement('div');
-    wrap.className = 'max-w-7xl mx-auto space-y-16 fade-in';
+    wrap.className = 'max-w-7xl mx-auto space-y-20 fade-in';
 
     wrap.innerHTML = `
         <div class="text-center space-y-4">
@@ -1483,6 +1483,94 @@ function renderHelp(app) {
             <h1 class="text-6xl font-black text-primary tracking-tight">System <span class="text-secondary">Intelligence</span> Guide</h1>
             <p class="text-on-surface-variant text-lg max-w-2xl mx-auto font-medium">Strategic documentation for the DoVER decentralized document integrity ecosystem.</p>
         </div>
+
+        <!-- ── New: How to Use the Website (Flowchart UI) ── -->
+        <section class="space-y-12">
+            <div class="flex items-center gap-4">
+                <div class="h-px flex-1 bg-slate-200"></div>
+                <h2 class="text-xs font-black uppercase tracking-[0.3em] text-slate-400">Quick Start: User Journey</h2>
+                <div class="h-px flex-1 bg-slate-200"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 relative">
+                <!-- Visual Connectors (Desktop only) -->
+                <div class="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-slate-100 -translate-y-1/2 -z-10"></div>
+                
+                <!-- Step 1 -->
+                <div class="bg-white p-6 rounded-[2rem] shadow-xl shadow-slate-200/40 border border-slate-100 text-center space-y-4 group hover:border-primary transition-all">
+                    <div class="w-14 h-14 bg-slate-50 text-slate-400 rounded-2xl flex items-center justify-center mx-auto group-hover:bg-primary group-hover:text-white transition-colors">
+                        <span class="material-symbols-outlined text-3xl">login</span>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-[10px] font-black uppercase text-secondary tracking-widest">Step 01</p>
+                        <h4 class="font-bold text-primary">Identity Selection</h4>
+                        <p class="text-[11px] text-slate-500 leading-relaxed">Toggle between <strong>Citizen</strong> or <strong>Institution</strong> modes in the top-left sidebar.</p>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="bg-white p-6 rounded-[2rem] shadow-xl shadow-slate-200/40 border border-slate-100 text-center space-y-4 group hover:border-primary transition-all">
+                    <div class="w-14 h-14 bg-slate-50 text-slate-400 rounded-2xl flex items-center justify-center mx-auto group-hover:bg-primary group-hover:text-white transition-colors">
+                        <span class="material-symbols-outlined text-3xl">upload_file</span>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-[10px] font-black uppercase text-secondary tracking-widest">Step 02</p>
+                        <h4 class="font-bold text-primary">Secure Upload</h4>
+                        <p class="text-[11px] text-slate-500 leading-relaxed">Upload documents. They are instantly <strong>hashed and sealed</strong> on the private blockchain.</p>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="bg-white p-6 rounded-[2rem] shadow-xl shadow-slate-200/40 border border-slate-100 text-center space-y-4 group hover:border-primary transition-all">
+                    <div class="w-14 h-14 bg-slate-50 text-slate-400 rounded-2xl flex items-center justify-center mx-auto group-hover:bg-primary group-hover:text-white transition-colors">
+                        <span class="material-symbols-outlined text-3xl">verified_user</span>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-[10px] font-black uppercase text-secondary tracking-widest">Step 03</p>
+                        <h4 class="font-bold text-primary">Verify Integrity</h4>
+                        <p class="text-[11px] text-slate-500 leading-relaxed">Use the <strong>Quick Verify</strong> tool to compare any file against the blockchain record.</p>
+                    </div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="bg-white p-6 rounded-[2rem] shadow-xl shadow-slate-200/40 border border-slate-100 text-center space-y-4 group hover:border-primary transition-all">
+                    <div class="w-14 h-14 bg-slate-50 text-slate-400 rounded-2xl flex items-center justify-center mx-auto group-hover:bg-primary group-hover:text-white transition-colors">
+                        <span class="material-symbols-outlined text-3xl">account_tree</span>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-[10px] font-black uppercase text-secondary tracking-widest">Step 04</p>
+                        <h4 class="font-bold text-primary">Audit Ledger</h4>
+                        <p class="text-[11px] text-slate-500 leading-relaxed">Monitor your <strong>Global</strong> or <strong>Corporate</strong> ledger for a complete immutable audit trail.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Role-Specific Guides -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-primary p-8 rounded-[2.5rem] text-white space-y-4">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-secondary">person</span>
+                        <h3 class="text-xl font-bold uppercase tracking-tight">For Citizens</h3>
+                    </div>
+                    <p class="text-sm opacity-80 leading-relaxed">Protect your birth certificates, degrees, and medical records. Use the <strong>Personal Vault</strong> to ensure your data is never tampered with by external agencies.</p>
+                    <div class="pt-4 flex gap-4">
+                        <div class="bg-white/10 px-4 py-2 rounded-xl text-[10px] font-bold">#PrivacyFirst</div>
+                        <div class="bg-white/10 px-4 py-2 rounded-xl text-[10px] font-bold">#SelfSovereign</div>
+                    </div>
+                </div>
+                <div class="bg-secondary p-8 rounded-[2.5rem] text-primary space-y-4">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined">business</span>
+                        <h3 class="text-xl font-bold uppercase tracking-tight">For Institutions</h3>
+                    </div>
+                    <p class="text-sm opacity-80 leading-relaxed">Issue certificates, manage employee records, and conduct batch audits. Use the <strong>Corporate Ledger</strong> to maintain enterprise-grade compliance logs.</p>
+                    <div class="pt-4 flex gap-4">
+                        <div class="bg-primary/5 px-4 py-2 rounded-xl text-[10px] font-bold">#Compliance</div>
+                        <div class="bg-primary/5 px-4 py-2 rounded-xl text-[10px] font-bold">#Transparency</div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
         <!-- Implementation Disclaimer Block -->
         <div class="bg-blue-50 border border-blue-100 rounded-[2rem] p-10 flex flex-col md:flex-row gap-8 items-center shadow-sm">
