@@ -28,6 +28,9 @@ function addColumn(table, column, type) {
 const docColumns = [
     ['uploader_email', 'TEXT'],
     ['department', 'TEXT DEFAULT "General"'],
+    ['prev_hash', 'TEXT'],
+    ['storage_id', 'TEXT'],
+    ['polygon_txid', 'TEXT'],
     ['ocr_text', 'TEXT'],
     ['ocr_hash', 'TEXT'],
     ['forensic_score', 'TEXT'],

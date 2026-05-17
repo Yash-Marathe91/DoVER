@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS documents (
     version_note TEXT,
     checkpoint_hash TEXT,
     ai_summary TEXT,
+    polygon_txid TEXT,
     is_tampered BOOLEAN DEFAULT 0,
     last_checked_at DATETIME
 );
