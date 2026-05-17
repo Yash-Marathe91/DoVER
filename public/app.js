@@ -4,7 +4,7 @@ const API_KEY = '11824503150ade959ba564320a36fcbb24274766c0a7f62589498eef4738337
 // ── API helpers ──
 const API = {
     async getStats() { return (await fetch('/api/stats')).json(); },
-    async getChain() { return (await fetch('/api/chain')).json(); },
+    async getChain(mode = 'b2c') { return (await fetch(`/api/chain?mode=${mode}`)).json(); },
     async upload(formData, file) {
         const fileHash = await computeFileHash(file);
         return (await secureFetch('/api/upload', {
@@ -1249,7 +1249,7 @@ function loadChain(silent = false) {
     const body = document.getElementById('chain-body');
     if (!body) return;
     if (!silent) body.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-slate-400">Loading chain...</td></tr>';
-    API.getChain().then(chain => {
+    API.getChain(currentMode).then(chain => {
         if (!chain.length) {
             body.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-slate-400">No blocks yet. Upload a document to begin.</td></tr>';
             document.getElementById('chain-count').textContent = '0 entries';

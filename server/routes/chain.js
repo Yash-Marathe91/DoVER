@@ -10,10 +10,11 @@ const fs = require('fs');
 const path = require('path');
 
 /**
- * Helper to check if a user can access a specific document.
+ * Helper to check if a user can access the full content/files of a document.
  * Authority can access all. Regular users can only access their own.
+ * Note: Metadata is now visible to all in the Global Ledger for transparency.
  */
-function canAccessDocument(user, document) {
+function canAccessFullContent(user, document) {
     if (!user) return false;
     if (user.role === 'authority') return true;
     return document.uploader_email === user.email;
@@ -23,18 +24,36 @@ router.get('/', (req, res) => {
     try {
         const isAuthority = req.user && req.user.role === 'authority';
         const isLoggedIn = !!req.user;
+        const mode = req.query.mode || 'b2c'; // Default to personal vault mode
         
+        if (!isLoggedIn) {
+            return res.json([]);
+        }
+
         let documents;
         if (isAuthority) {
-            // Authorities see everything
-            documents = db.prepare('SELECT * FROM documents ORDER BY block_index DESC').all();
-        } else if (isLoggedIn) {
-            // Logged in users see their own documents (case-insensitive)
-            documents = db.prepare('SELECT * FROM documents WHERE LOWER(uploader_email) = LOWER(?) ORDER BY block_index DESC').all(req.user.email);
+            // Authorities see everything for oversight
+            documents = db.prepare('SELECT block_index, filename, file_type, uploaded_by, uploader_email, department, upload_timestamp, file_hash, block_hash, is_tampered, version_number, polygon_txid, merkle_root, merkle_proof FROM documents ORDER BY block_index DESC').all();
+        } else if (mode === 'b2b') {
+            // Institutional Ledger: Show documents within the same department
+            // This isolates corporate records from personal citizen records.
+            const userDept = req.user.department || 'General';
+            documents = db.prepare(`
+                SELECT block_index, filename, file_type, uploaded_by, uploader_email, department, upload_timestamp, file_hash, block_hash, is_tampered, version_number, polygon_txid, merkle_root, merkle_proof 
+                FROM documents 
+                WHERE department = ? 
+                ORDER BY block_index DESC
+            `).all(userDept);
         } else {
-            // No guest mode: return empty array if not authenticated
-            documents = [];
+            // Personal Ledger (B2C): Show only the user's own life records.
+            documents = db.prepare(`
+                SELECT block_index, filename, file_type, uploaded_by, uploader_email, department, upload_timestamp, file_hash, block_hash, is_tampered, version_number, polygon_txid, merkle_root, merkle_proof 
+                FROM documents 
+                WHERE LOWER(uploader_email) = LOWER(?) 
+                ORDER BY block_index DESC
+            `).all(req.user.email);
         }
+        
         res.json(documents);
     } catch (error) {
         console.error(error);
@@ -81,7 +100,7 @@ router.get('/document/:id', (req, res) => {
             return res.status(404).json({ success: false, error: 'Document not found' });
         }
 
-        if (!canAccessDocument(req.user, document)) {
+        if (!canAccessFullContent(req.user, document)) {
             return res.status(403).json({ success: false, error: 'Permission denied' });
         }
 
@@ -99,7 +118,7 @@ router.get('/document/:id/history', (req, res) => {
             return res.status(404).json({ success: false, error: 'Document not found' });
         }
 
-        if (!canAccessDocument(req.user, doc)) {
+        if (!canAccessFullContent(req.user, doc)) {
             return res.status(403).json({ success: false, error: 'Permission denied' });
         }
 
@@ -206,7 +225,7 @@ router.get('/document/:id/versions', (req, res) => {
         }
 
         // RBAC check
-        if (!canAccessDocument(req.user, currentDoc)) {
+        if (!canAccessFullContent(req.user, currentDoc)) {
             return res.status(403).json({ success: false, error: 'Permission denied' });
         }
 
@@ -345,7 +364,7 @@ router.get('/document/:id/certified', async (req, res) => {
         }
 
         // RBAC: Authority OR Document Owner
-        if (!canAccessDocument(req.user, doc)) {
+        if (!canAccessFullContent(req.user, doc)) {
             return res.status(403).json({ success: false, error: 'Permission denied' });
         }
 
