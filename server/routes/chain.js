@@ -36,7 +36,6 @@ router.get('/', (req, res) => {
             documents = db.prepare('SELECT block_index, filename, file_type, uploaded_by, uploader_email, department, upload_timestamp, file_hash, block_hash, is_tampered, version_number, polygon_txid, merkle_root, merkle_proof FROM documents ORDER BY block_index DESC').all();
         } else if (mode === 'b2b') {
             // Institutional Ledger: Show documents that belong to B2B categories.
-            // This ensures corporate records are shown together, separate from personal ones.
             const b2bDepts = ['Employee Records', 'Financial Audit', 'Compliance', 'Legal', 'Executive Office']; 
             const placeholders = b2bDepts.map(() => '?').join(',');
             
@@ -47,13 +46,18 @@ router.get('/', (req, res) => {
                 ORDER BY block_index DESC
             `).all(...b2bDepts);
         } else {
-            // Personal Ledger (B2C): Show only the user's own life records.
+            // Personal Ledger (B2C): Show only personal records.
+            // We EXCLUDE B2B departments to ensure a clean separation.
+            const b2bDepts = ['Employee Records', 'Financial Audit', 'Compliance', 'Legal', 'Executive Office'];
+            const placeholders = b2bDepts.map(() => '?').join(',');
+            
             documents = db.prepare(`
                 SELECT block_index, filename, file_type, uploaded_by, uploader_email, department, upload_timestamp, file_hash, block_hash, is_tampered, version_number, polygon_txid, merkle_root, merkle_proof 
                 FROM documents 
                 WHERE LOWER(uploader_email) = LOWER(?) 
+                AND department NOT IN (${placeholders})
                 ORDER BY block_index DESC
-            `).all(req.user.email);
+            `).all(req.user.email, ...b2bDepts);
         }
         
         res.json(documents);
