@@ -3,28 +3,28 @@
  */
 const InstitutionModule = {
     renderDashboard(app) {
-        if (typeof renderGlobalDashboard === 'function') renderGlobalDashboard(app);
+        if (typeof renderDashboard === 'function') renderDashboard(app);
     },
     renderUpload(app) {
         if (typeof renderGlobalUpload === 'function') renderGlobalUpload(app);
     },
     renderVerify(app) {
-        if (typeof renderGlobalVerify === 'function') renderGlobalVerify(app);
+        if (typeof renderVerify === 'function') renderVerify(app);
     },
     renderBatch(app) {
         if (typeof renderGlobalBatch === 'function') renderGlobalBatch(app);
     },
     renderAudit(app) {
-        if (typeof renderGlobalAudit === 'function') renderGlobalAudit(app);
+        if (typeof renderAudit === 'function') renderAudit(app);
     },
     renderChain(app) {
-        if (typeof renderGlobalChain === 'function') renderGlobalChain(app);
+        if (typeof renderChain === 'function') renderChain(app);
     },
     async renderAdmin(app) {
         if (typeof renderGlobalAdmin === 'function') await renderGlobalAdmin(app);
     },
     renderSettings(app) {
-        if (typeof renderGlobalSettings === 'function') renderGlobalSettings(app);
+        if (typeof renderSettings === 'function') renderSettings(app);
     },
     renderHelp(app) {
         document.getElementById('page-title').textContent = 'Institutional Console Guide';

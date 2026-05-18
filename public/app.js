@@ -624,7 +624,7 @@ function renderDashboard(app) {
             <span class="material-symbols-outlined text-lg">add</span> ${isB2b ? 'Issue New Certificate' : 'Protect New Document'}</a>
     </div>`;
     wrap.appendChild(header);
-    renderStatsBar(wrap);
+    renderGlobalStatsBar(wrap);
 
     // Vault Explorer with Tabs
     const explorer = document.createElement('div');
@@ -1324,7 +1324,7 @@ function renderChain(app) {
                 </div>
             </div>
         </div>`;
-    renderStatsBar(wrap);
+    renderGlobalStatsBar(wrap);
 
     const tableWrap = document.createElement('div');
     tableWrap.className = 'bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm';
