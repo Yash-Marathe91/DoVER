@@ -122,6 +122,18 @@ async function secureFetch(url, options = {}) {
 }
 
 
+// ── Category Mapping for B2B/B2C ──
+const CATEGORY_MAP = {
+    b2c: {
+        'Personal': ['Personal', 'Personal Identity (Passport/ID)', 'Academic Certificates', 'Medical Reports'],
+        'Family': ['Family', 'Family Records (Birth/Marriage)', 'Financial Assets'],
+        'Office': ['Office', 'Office Records']
+    },
+    b2b: {
+        'Employee Records': ['Employee Records', 'Employee Contract', 'Personnel ID / KYC', 'Payroll & Tax', 'Experience Letters', 'Non-Disclosure Agreements', 'Termination Records']
+    }
+};
+
 // ── Auth State ──
 let currentUser = null;
 
@@ -407,7 +419,6 @@ function navigate() {
         l.classList.toggle('shadow-sm', isPageMatch);
     });
 
-    const app = document.getElementById('app');
     app.innerHTML = '';
 
     const module = mode === 'vault' ? CitizenModule : InstitutionModule;
@@ -436,18 +447,6 @@ window.addEventListener('DOMContentLoaded', checkAuth);
 document.getElementById('menu-toggle')?.addEventListener('click', () => {
     document.getElementById('sidebar').classList.toggle('mobile-open');
 });
-
-// ── Category Mapping for B2B/B2C ──
-const CATEGORY_MAP = {
-    b2c: {
-        'Personal': ['Personal', 'Personal Identity (Passport/ID)', 'Academic Certificates', 'Medical Reports'],
-        'Family': ['Family', 'Family Records (Birth/Marriage)', 'Financial Assets'],
-        'Office': ['Office', 'Office Records']
-    },
-    b2b: {
-        'Employee Records': ['Employee Records', 'Employee Contract', 'Personnel ID / KYC', 'Payroll & Tax', 'Experience Letters', 'Non-Disclosure Agreements', 'Termination Records']
-    }
-};
 
 function renderTable(container, documents) {
     if (!documents.length) {
