@@ -258,6 +258,11 @@ function updateSidebarUI(user) {
 }
 
 function renderLogin(container) {
+    const sidebar = document.getElementById('sidebar');
+    const header = document.querySelector('header');
+    if (sidebar) sidebar.style.display = 'none';
+    if (header) header.style.display = 'none';
+    container.classList.remove('md:ml-64');
     container.innerHTML = `
         <div class="fixed inset-0 flex items-center justify-center bg-slate-50 dark:bg-[#0A192F] z-[100] fade-in">
             <div class="bg-white dark:bg-[#1C2A41] p-12 rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-slate-100 dark:border-slate-800 max-w-md w-full text-center space-y-8 scale-in mx-6">
@@ -322,6 +327,11 @@ function updateHeaderUI(header, user) {
 
 function renderGateway() {
     const app = document.getElementById('app');
+    const sidebar = document.getElementById('sidebar');
+    const header = document.querySelector('header');
+    if (sidebar) sidebar.style.display = 'none';
+    if (header) header.classList.remove('md:pl-72');
+    app.classList.remove('md:ml-64');
     document.getElementById('page-title').textContent = 'Product Selection';
     app.innerHTML = `
         <div class="max-w-4xl mx-auto py-12 px-6 fade-in">
@@ -379,6 +389,12 @@ function navigate() {
     }
 
     // Update Sidebar to reflect mode
+    const sidebar = document.getElementById('sidebar');
+    const app = document.getElementById('app');
+    const header = document.querySelector('header');
+    if (sidebar) sidebar.style.display = 'flex';
+    if (app) app.classList.add('md:ml-64');
+    if (header) header.classList.add('md:pl-72');
     updateSidebarUI(currentUser);
 
     // Update active nav link
