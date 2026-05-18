@@ -126,12 +126,11 @@ async function secureFetch(url, options = {}) {
 let currentUser = null;
 
 // ── Role State ──
-let currentMode = localStorage.getItem('dover_mode') || 'b2c'; // Default to Citizen
+let currentMode = 'b2c'; // Default to Citizen
 let activeCategory = 'all'; // Default to all documents
 
 function switchMode(mode) {
     currentMode = mode;
-    localStorage.setItem('dover_mode', mode);
     activeCategory = 'all'; // Reset category filter on mode switch
 
     // Update Buttons
@@ -139,18 +138,16 @@ function switchMode(mode) {
     const btnB2b = document.getElementById('btn-b2b');
 
     if (mode === 'b2c') {
-        btnB2c.className = 'flex-1 py-1.5 px-2 rounded-lg text-[10px] font-black uppercase bg-primary text-white shadow-md transition-all';
-        btnB2b.className = 'flex-1 py-1.5 px-2 rounded-lg text-[10px] font-black uppercase text-slate-400 hover:text-slate-600 transition-all';
+        if (btnB2c) btnB2c.className = 'flex-1 py-1.5 px-2 rounded-lg text-[10px] font-black uppercase bg-primary text-white shadow-md transition-all';
+        if (btnB2b) btnB2b.className = 'flex-1 py-1.5 px-2 rounded-lg text-[10px] font-black uppercase text-slate-400 hover:text-slate-600 transition-all';
+        location.hash = '#/vault/dashboard';
     } else {
-        btnB2b.className = 'flex-1 py-1.5 px-2 rounded-lg text-[10px] font-black uppercase bg-primary text-white shadow-md transition-all';
-        btnB2c.className = 'flex-1 py-1.5 px-2 rounded-lg text-[10px] font-black uppercase text-slate-400 hover:text-slate-600 transition-all';
+        if (btnB2b) btnB2b.className = 'flex-1 py-1.5 px-2 rounded-lg text-[10px] font-black uppercase bg-primary text-white shadow-md transition-all';
+        if (btnB2c) btnB2c.className = 'flex-1 py-1.5 px-2 rounded-lg text-[10px] font-black uppercase text-slate-400 hover:text-slate-600 transition-all';
+        location.hash = '#/console/dashboard';
     }
 
     updateSidebarUI(currentUser);
-    navigate();
-
-    // Close mobile sidebar after mode switch
-    document.getElementById('sidebar')?.classList.remove('mobile-open');
 }
 
 // ── Mobile Toggle ──
@@ -192,8 +189,8 @@ async function checkAuth() {
             header.style.display = 'flex';
             updateHeaderUI(header, currentUser);
         }
-        // Initialize Mode UI
-        switchMode(currentMode);
+        // Navigate based on current hash
+        navigate();
     }
 }
 
@@ -201,46 +198,55 @@ function updateSidebarUI(user) {
     const navLinks = document.getElementById('nav-links');
     if (!navLinks) return;
 
+    // Show/Hide Role Switcher for Authority (Judges)
+    const roleSwitcher = document.getElementById('role-switcher-container');
+    if (roleSwitcher) {
+        if (user.role === 'authority') {
+            roleSwitcher.classList.remove('hidden');
+        } else {
+            roleSwitcher.classList.add('hidden');
+        }
+    }
+
     if (currentMode === 'b2c') {
         // Citizen Navigation
         navLinks.innerHTML = `
-            <a href="#dashboard" data-page="dashboard" class="nav-link flex items-center px-4 py-3 mx-2 rounded-lg transition-all group">
+            <a href="#/vault/dashboard" class="nav-link flex items-center px-4 py-3 mx-2 rounded-lg transition-all group">
                 <span class="material-symbols-outlined mr-3 text-xl">account_balance_wallet</span><span class="font-medium text-sm">My Vault</span>
             </a>
-            <a href="#upload" data-page="upload" class="nav-link flex items-center px-4 py-3 mx-2 rounded-lg transition-all group">
+            <a href="#/vault/upload" class="nav-link flex items-center px-4 py-3 mx-2 rounded-lg transition-all group">
                 <span class="material-symbols-outlined mr-3 text-xl">add_moderator</span><span class="font-medium text-sm">Secure Personal Doc</span>
             </a>
-            <a href="#verify" data-page="verify" class="nav-link flex items-center px-4 py-3 mx-2 rounded-lg transition-all group">
+            <a href="#/vault/verify" class="nav-link flex items-center px-4 py-3 mx-2 rounded-lg transition-all group">
                 <span class="material-symbols-outlined mr-3 text-xl">verified_user</span><span class="font-medium text-sm">Quick Verify</span>
             </a>
-            <a href="#chain" data-page="chain" class="nav-link flex items-center px-4 py-3 mx-2 rounded-lg transition-all group">
+            <a href="#/vault/chain" class="nav-link flex items-center px-4 py-3 mx-2 rounded-lg transition-all group">
                 <span class="material-symbols-outlined mr-3 text-xl">account_tree</span><span class="font-medium text-sm">Global Ledger</span>
             </a>
         `;
     } else {
         // Institutional Navigation
         navLinks.innerHTML = `
-            <a href="#dashboard" data-page="dashboard" class="nav-link flex items-center px-4 py-3 mx-2 rounded-lg transition-all group">
+            <a href="#/console/dashboard" class="nav-link flex items-center px-4 py-3 mx-2 rounded-lg transition-all group">
                 <span class="material-symbols-outlined mr-3 text-xl">analytics</span><span class="font-medium text-sm">Admin Dashboard</span>
             </a>
-            <a href="#upload" data-page="upload" class="nav-link flex items-center px-4 py-3 mx-2 rounded-lg transition-all group">
+            <a href="#/console/upload" class="nav-link flex items-center px-4 py-3 mx-2 rounded-lg transition-all group">
                 <span class="material-symbols-outlined mr-3 text-xl">upload_file</span><span class="font-medium text-sm">Institutional Upload</span>
             </a>
-            <a href="#batch" data-page="batch" class="nav-link flex items-center px-4 py-3 mx-2 rounded-lg transition-all group">
+            <a href="#/console/batch" class="nav-link flex items-center px-4 py-3 mx-2 rounded-lg transition-all group">
                 <span class="material-symbols-outlined mr-3 text-xl">folder_managed</span><span class="font-medium text-sm">Batch Ingestion</span>
             </a>
-            <a href="#audit" data-page="audit" class="nav-link flex items-center px-4 py-3 mx-2 rounded-lg transition-all group">
+            <a href="#/console/audit" class="nav-link flex items-center px-4 py-3 mx-2 rounded-lg transition-all group">
                 <span class="material-symbols-outlined mr-3 text-xl">history_edu</span><span class="font-medium text-sm">Compliance Logs</span>
             </a>
-            <a href="#chain" data-page="chain" class="nav-link flex items-center px-4 py-3 mx-2 rounded-lg transition-all group">
+            <a href="#/console/chain" class="nav-link flex items-center px-4 py-3 mx-2 rounded-lg transition-all group">
                 <span class="material-symbols-outlined mr-3 text-xl">account_tree</span><span class="font-medium text-sm">Corporate Ledger</span>
             </a>
         `;
 
         if (user.role === 'authority') {
             const adminLink = document.createElement('a');
-            adminLink.href = '#admin';
-            adminLink.dataset.page = 'admin';
+            adminLink.href = '#/console/admin';
             adminLink.className = 'nav-link flex items-center px-4 py-3 mx-2 rounded-lg transition-all group';
             adminLink.innerHTML = `
                 <span class="material-symbols-outlined mr-3 text-xl">admin_panel_settings</span>
@@ -314,14 +320,71 @@ function updateHeaderUI(header, user) {
     });
 }
 
+function renderGateway() {
+    const app = document.getElementById('app');
+    document.getElementById('page-title').textContent = 'Product Selection';
+    app.innerHTML = `
+        <div class="max-w-4xl mx-auto py-12 px-6 fade-in">
+            <div class="text-center mb-16">
+                <h1 class="text-4xl font-extrabold text-primary mb-4">Welcome to DoVER</h1>
+                <p class="text-on-surface-variant text-lg">Select your destination to begin</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div onclick="switchMode('b2c')" class="group bg-white dark:bg-[#1C2A41] p-8 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-xl hover:border-primary hover:scale-[1.02] transition-all cursor-pointer">
+                    <div class="w-16 h-16 bg-blue-50 dark:bg-blue-900/30 text-primary rounded-2xl flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-white transition-all">
+                        <span class="material-symbols-outlined text-3xl">account_balance_wallet</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-primary mb-2">Personal Vault</h3>
+                    <p class="text-on-surface-variant text-sm leading-relaxed mb-6">Manage your identities, certificates, and personal records in a secure, self-sovereign environment.</p>
+                    <div class="text-primary font-bold text-sm flex items-center gap-2 font-black uppercase tracking-widest">Enter Vault <span class="material-symbols-outlined text-sm">arrow_forward</span></div>
+                </div>
+
+                <div onclick="switchMode('b2b')" class="group bg-white dark:bg-[#1C2A41] p-8 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-xl hover:border-secondary hover:scale-[1.02] transition-all cursor-pointer">
+                    <div class="w-16 h-16 bg-blue-50 dark:bg-blue-900/30 text-secondary rounded-2xl flex items-center justify-center mb-6 group-hover:bg-secondary group-hover:text-white transition-all">
+                        <span class="material-symbols-outlined text-3xl">business</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-primary mb-2">Organization Console</h3>
+                    <p class="text-on-surface-variant text-sm leading-relaxed mb-6">Issue documents, verify employee records, and manage institutional compliance at scale.</p>
+                    <div class="text-secondary font-bold text-sm flex items-center gap-2 font-black uppercase tracking-widest">Enter Console <span class="material-symbols-outlined text-sm">arrow_forward</span></div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
 // ── Router ──
 function navigate() {
     if (!currentUser) return checkAuth();
-    const page = (location.hash.slice(1) || 'dashboard');
+    
+    const hash = location.hash.slice(1);
+    let mode = '';
+    let page = '';
 
-    // Updated selector to match dynamic links
+    if (hash.startsWith('/vault')) {
+        mode = 'vault';
+        page = hash.slice(7) || 'dashboard';
+        currentMode = 'b2c';
+    } else if (hash.startsWith('/console')) {
+        mode = 'console';
+        page = hash.slice(9) || 'dashboard';
+        currentMode = 'b2b';
+    } else if (hash === '' || hash === '/') {
+        return renderGateway();
+    } else {
+        // Fallback for legacy hashes if any
+        const legacyPage = hash.split('/')[0] || 'dashboard';
+        location.hash = `#/vault/${legacyPage}`;
+        return;
+    }
+
+    // Update Sidebar to reflect mode
+    updateSidebarUI(currentUser);
+
+    // Update active nav link
     document.querySelectorAll('.nav-link').forEach(l => {
-        const isPageMatch = l.dataset.page === page || l.getAttribute('href') === `#${page}`;
+        const href = l.getAttribute('href');
+        const isPageMatch = href === `#/${mode}/${page}`;
         l.classList.toggle('bg-white/60', isPageMatch);
         l.classList.toggle('dark:bg-white/10', isPageMatch);
         l.classList.toggle('text-primary', isPageMatch);
@@ -330,22 +393,26 @@ function navigate() {
 
     const app = document.getElementById('app');
     app.innerHTML = '';
+
+    const module = mode === 'vault' ? CitizenModule : InstitutionModule;
+
     switch (page) {
-        case 'upload': renderUpload(app); break;
-        case 'verify': renderVerify(app); break;
-        case 'chain': renderChain(app); break;
-        case 'audit': renderAudit(app); break;
-        case 'settings': renderSettings(app); break;
-        case 'help': renderHelp(app); break;
-        case 'batch': renderBatch(app); break;
-        case 'admin':
+        case 'dashboard': module.renderDashboard(app); break;
+        case 'upload': module.renderUpload(app); break;
+        case 'verify': module.renderVerify(app); break;
+        case 'chain': module.renderChain(app); break;
+        case 'audit': module.renderAudit(app); break;
+        case 'batch': module.renderBatch(app); break;
+        case 'admin': 
             if (currentUser.role === 'authority') {
-                renderAdmin(app);
+                module.renderAdmin(app); 
             } else {
-                location.hash = '#dashboard';
+                location.hash = '#/vault/dashboard';
             }
             break;
-        default: renderDashboard(app); break;
+        case 'settings': module.renderSettings(app); break;
+        case 'help': module.renderHelp(app); break;
+        default: module.renderDashboard(app); break;
     }
 }
 window.addEventListener('hashchange', navigate);

@@ -52,7 +52,7 @@
         </div>
 
         <!-- Role Switcher -->
-        <div class="px-4 mb-6">
+        <div id="role-switcher-container" class="px-4 mb-6 hidden">
             <div class="bg-white/50 dark:bg-black/20 p-1 rounded-xl flex items-center border border-slate-200 dark:border-slate-700" role="group" aria-label="Vault Mode Switcher">
                 <button id="btn-b2c" onclick="switchMode('b2c')" aria-label="Switch to Citizen Vault" class="flex-1 py-1.5 px-2 rounded-lg text-[10px] font-black uppercase transition-all">Citizen</button>
                 <button id="btn-b2b" onclick="switchMode('b2b')" aria-label="Switch to Institutional Portal" class="flex-1 py-1.5 px-2 rounded-lg text-[10px] font-black uppercase transition-all">Institution</button>
@@ -85,6 +85,8 @@
 
     <main id="app" class="pt-24 pb-12 px-6 md:ml-64 transition-all"></main>
 
+    <script src="/js/citizen.js?v=26042026_01"></script>
+    <script src="/js/institution.js?v=26042026_01"></script>
     <script src="/app.js?v=26042026_01"></script>
 </body>
 </html>
