@@ -456,7 +456,7 @@ function navigate() {
                 location.hash = `/${mode}/dashboard`;
             }
             break;
-        case 'settings': module.renderSettings(app); break;
+        case 'settings': module.renderGlobalSettings(app); break;
         case 'help': module.renderHelp(app); break;
         default: module.renderDashboard(app); break;
     }
@@ -1231,7 +1231,7 @@ function renderVerify(app) {
             const reasons = res.tamper_reasons ? res.tamper_reasons.map(r => `<li class="flex items-center gap-2 text-red-800/80"><span class="w-1.5 h-1.5 rounded-full bg-red-400"></span> ${r}</li>`).join('') : '';
             const blockId = res.document_id || res.block_index || 'N/A';
 
-            const chainWarning = res.chain_warning ? `
+            chainWarning = res.chain_warning ? `
                 <div class="bg-orange-50 border border-orange-100 p-4 rounded-lg my-4 flex gap-3">
                     <span class="material-symbols-outlined text-orange-500">warning</span>
                     <div>
@@ -2556,7 +2556,7 @@ async function downloadReport(id) {
 }
 
 // ── Admin Page ──
-async function renderAdmin(app) {
+async function renderGlobalAdmin(app) {
     document.getElementById('page-title').textContent = 'System Administration';
     const wrap = document.createElement('div');
     wrap.className = 'max-w-7xl mx-auto space-y-8 fade-in';
@@ -2726,6 +2726,10 @@ async function toggleAuthority(userId, newRole, btn) {
         btn.innerHTML = originalContent;
     }
 }
+
+}
+}
+
 
 }
 }
