@@ -76,8 +76,15 @@ router.post('/', uploadLimiter, (req, res) => {
             const version_note = req.body.version_note || null;
 
             if (parent_document_id) {
-                const parent = db.prepare('SELECT version_number FROM documents WHERE block_index = ?').get(parent_document_id);
-                if (parent) version_number = (parent.version_number || 1) + 1;
+                const parent = db.prepare('SELECT version_number, uploader_email FROM documents WHERE block_index = ?').get(parent_document_id);
+                if (parent) {
+                    // SECURITY FIX: IDOR / Version Poisoning
+                    if ((parent.uploader_email !== uploaderEmail || uploaderEmail === 'anonymous@dover.io') && (!req.user || req.user.role !== 'authority')) {
+                        if (tmpFilePath && fs.existsSync(tmpFilePath)) fs.unlinkSync(tmpFilePath);
+                        return res.status(403).json({ success: false, error: 'Unauthorized to append a new version to this document.' });
+                    }
+                    version_number = (parent.version_number || 1) + 1;
+                }
             }
 
             // GridFS Upload
