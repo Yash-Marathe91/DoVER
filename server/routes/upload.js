@@ -67,6 +67,14 @@ router.post('/', uploadLimiter, (req, res) => {
             
             let userDept = req.body.department || 'General';
 
+            // SECURITY FIX: Prevent unprivileged users from assigning documents to restricted B2B departments
+            const b2bDepts = ['Employee Records', 'Financial Audit', 'Compliance', 'Legal', 'Executive Office'];
+            if (b2bDepts.includes(userDept)) {
+                if (!req.user || req.user.role !== 'authority') {
+                    userDept = 'General';
+                }
+            }
+
             // Calculate hash
             const fileHash = await hasher.generateFileHashAsync(tmpFilePath);
 
@@ -158,7 +166,15 @@ router.post('/batch-upload', uploadLimiter, (req, res) => {
 
             const uploadedBy = req.user?.name || 'Anonymous';
             const uploaderEmail = req.user?.email || 'anonymous@dover.io';
-            const documentCategory = req.body.department || 'General';
+            let documentCategory = req.body.department || 'General';
+
+            // SECURITY FIX: Prevent unprivileged users from assigning documents to restricted B2B departments
+            const b2bDepts = ['Employee Records', 'Financial Audit', 'Compliance', 'Legal', 'Executive Office'];
+            if (b2bDepts.includes(documentCategory)) {
+                if (!req.user || req.user.role !== 'authority') {
+                    documentCategory = 'General';
+                }
+            }
 
             const batchId = Date.now();
             const jobIds = [];
