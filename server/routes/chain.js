@@ -169,9 +169,9 @@ router.get('/batch/:batch_id/status', async (req, res) => {
 
         // RBAC: Ensure user owns this batch OR is authority
         const isAuthority = req.user && req.user.role === 'authority';
-        const ownsBatch = batchJobs.every(j => j.data.uploaderEmail === req.user.email);
+        const ownsBatch = batchJobs.every(j => j.data.uploaderEmail === req.user?.email);
         
-        if (!isAuthority && !ownsBatch) {
+        if (!req.user || (!isAuthority && !ownsBatch)) {
             return res.status(403).json({ success: false, error: 'Permission denied' });
         }
 
