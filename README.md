@@ -14,6 +14,9 @@
 
 ### Quick navigation
 - [Getting Started](#getting-started--deployment)
+- [Project Structure](#project-structure)
+- [Contributor Entry Points](#contributor-entry-points)
+- [Development Workflow](#development-workflow)
 - [Forensic Integrity & Verification](#forensic-integrity--verification)
 - [System Architecture](#system-architecture)
 - [Technology Stack](#technology-stack)
@@ -73,6 +76,83 @@ graph TD
 | **UI/UX** | Tailwind CSS, Glassmorphism Design System |
 
 ---
+
+## Project Structure
+
+```text
+DoVER/
+├── public/                 # Frontend assets and client-side scripts
+│   ├── app.js              # Frontend application logic
+│   ├── hero-banner.svg     # Project banner asset
+│   ├── js/                 # Citizen and institution workflows
+│   ├── index.html          # Landing page
+│   ├── verify.html         # Verification interface
+│   └── styles.css          # Application styling
+│
+├── server/                 # Backend application
+│   ├── db/                 # Database configuration and migrations
+│   ├── middleware/         # Authentication, security, and request validation
+│   ├── routes/             # API route definitions
+│   ├── utils/              # AI, PKI, blockchain, OCR, and verification utilities
+│   └── app.js              # Express application entry point
+│
+├── src/
+│   └── services/           # Frontend API communication layer
+│
+├── Dockerfile
+├── MODULE_MODE.md
+├── package.json 
+├── package-lock.json 
+└── README.md
+```
+
+## Directory Overview
+
+### `public/`
+
+Contains the user-facing application, including HTML pages, styling, static assets, and client-side JavaScript for citizen and institutional workflows.
+
+### `server/db/`
+
+Manages database connectivity, schema definitions, and migration scripts.
+
+### `server/middleware/`
+
+Provides authentication, API key validation, HMAC verification, rate limiting, and other request-processing middleware.
+
+### `server/routes/`
+
+Defines REST API endpoints for uploads, verification, authentication, administration, blockchain interactions, and statistics.
+
+### `server/utils/`
+
+Implements the core DoVER functionality, including AI-powered forensic analysis, OCR processing, PKI operations, Merkle tree generation, blockchain anchoring, digital signatures, reporting, and queue management.
+
+### `src/services/`
+
+Contains frontend service modules responsible for communicating with backend APIs such as document upload, verification, blockchain records, and statistics retrieval.
+
+## Contributor Entry Points
+
+New contributors can get started in the following areas:
+
+* **Frontend Enhancements:** Improve UI, responsiveness, and user workflows in `public/`.
+* **Backend Features:** Add or improve API endpoints and request handling in `server/routes/`.
+* **Security Improvements:** Enhance authentication, HMAC verification, and middleware protections in `server/middleware/`.
+* **AI & Verification:** Contribute to OCR, forensic analysis, Gemini integration, PKI workflows, and blockchain anchoring in `server/utils/`.
+* **Documentation:** Improve guides, onboarding materials, and project documentation.
+
+## Development Workflow
+
+1. Fork the repository.
+2. Clone your fork locally.
+3. Create a feature branch.
+4. Implement and test your changes.
+5. Commit with clear commit messages.
+6. Push the branch to your fork.
+7. Open a Pull Request describing your contribution.
+8. Address review feedback and update the PR as needed.
+
 
 ## Getting Started & Deployment
 
